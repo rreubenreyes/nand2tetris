@@ -15,5 +15,31 @@ CHIP RAM64 {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+      /* demux upper 3 bits to select one of the eight lower 3 bit combinations */
+      DMux8Way(in=load, sel=address[3..5], a=ua, b=ub, c=uc, d=ud, e=ue, f=uf, g=ug, h=uh);
+
+      /* select one of eight lower-3-bit busses
+       * RAM8 implements the same demux->reduce->mux pattern on individual registers */
+      RAM8(in=in, load=ua, address=address[0..2], out=la);
+      RAM8(in=in, load=ub, address=address[0..2], out=lb);
+      RAM8(in=in, load=uc, address=address[0..2], out=lc);
+      RAM8(in=in, load=ud, address=address[0..2], out=ld);
+      RAM8(in=in, load=ue, address=address[0..2], out=le);
+      RAM8(in=in, load=uf, address=address[0..2], out=lf);
+      RAM8(in=in, load=ug, address=address[0..2], out=lg);
+      RAM8(in=in, load=uh, address=address[0..2], out=lh);
+
+      /* mux total output */
+      Mux8Way16(
+        a=la,
+        b=lb,
+        c=lc,
+        d=ld,
+        e=le,
+        f=lf,
+        g=lg,
+        h=lh,
+        sel=address[3..5],
+        out=out
+      );
 }

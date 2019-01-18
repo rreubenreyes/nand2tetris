@@ -16,5 +16,17 @@ CHIP PC {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+      /* select whether to increment or emit out(t) */
+      Inc16(in=pcout, out=addout); 
+      Mux16(a=pcout, b=addout, sel=inc, out=incout);
+
+      /* select whether to increment or load *
+      /* if `load`, then `inc` does not apply */
+      Mux16(a=incout, b=in, sel=load, out=loadout);
+
+      /* select whether to load or reset */
+      Mux16(a=loadout, b[0..15]=false, sel=reset, out=rout);
+
+      /* access the register */
+      Register(in=rout, load=true, out=pcout, out=out);
 }
