@@ -27,5 +27,30 @@ CHIP Memory {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+      /* addressing patterns:
+       * 0x0000 - RAM[0] => 0b0000 0x000
+       * 0x3FFF - RAM end => 0b0011 0xFFF
+       * 0x4000 - screen start => 0b0100 0x000
+       * 0x5FFF - screen end => 0b0101 0xFFF
+       * 0x6000 - keyboard => 0b0110 0x000
+       */
+
+      /* only access screen when two address MSB are 10 */
+      /* only access keyboard when to address MSB are 11 */
+      DMux4Way(in=load, sel=address[13..14], a=loadram1, b=loadram2, c=loadscreen, d=loadkbd);
+      
+      /* else access RAM */
+      Or(a=loadram1, b=loadram2, out=loadram);
+
+      /* RAM */
+      RAM16K(in=in, load=loadram, address=address[0..13], out=ramout);
+      
+      /* screen */
+      Screen(in=in, load=loadscreen, address=address[0..12], out=screenout);
+
+      /* keyboard */ 
+      Keyboard(out=kbdout);
+
+      /* mux total output */
+      Mux4Way16(a=ramout, b=ramout, c=screenout, d=kbdout, sel=address[13..14], out=out);
 }

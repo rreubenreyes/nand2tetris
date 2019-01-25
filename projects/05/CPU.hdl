@@ -39,5 +39,69 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-    // Put your code here:
+        /* decode instruction */
+        // A-instruction (i=0): instruction is an address literal
+        // A-register gets a value
+        // D-register gets nothing
+        // A/M mux operates on A
+        // ALU computes nothing (x=instruction, y=D-register, out=instruction);
+        // PC goes to next instruction (load=0, inc=1, reset=0);
+
+        // C-instruction (i=1): instruction is coded
+        // use d1 as control bit for D/instruction mux
+        // write to A-register if i=0 & d1=0
+        Not(in=instruction[15], out=isainstruction);
+        Mux16(a=instruction, b=aluout, sel=instruction[15], out=ain); // control bit: i
+        Or(a=isainstruction, b=instruction[5], out=writetoa);
+        ARegister(in=ain, load=writetoa, out=aout, out[0..14]=addressM);
+        
+        /* write to A or M register if A-instruction or control bit a=1 */
+        And(a=instruction[15], b=instruction[12], out=am);
+        Mux16(a=aout, b=inM, sel=am, out=amout);
+
+        ALU(
+          x=dout,
+          y=amout,
+          zx=instruction[11],
+          nx=instruction[10],
+          zy=instruction[9],
+          ny=instruction[8],
+          f=instruction[7],
+          no=instruction[6],
+          out=aluout,
+          out=outM,
+          zr=zr,
+          ng=ng
+        );
+
+        /* write to D-register if d2=1 and i=1 */
+        And(a=instruction[15], b=instruction[4], out=d); // control bits: i, d2
+        DRegister(in=aluout, load=d, out=dout);
+        
+        /* write to M[A] if d3=1 and i=1 */
+        And(a=instruction[15], b=instruction[3], out=writeM);
+
+        Not(in=ng, out=pos);
+        Not(in=zr, out=nzr);
+
+        /* compile conditions for jump on j3 */
+        And(a=instruction[15], b=instruction[0], out=jgt);
+        And(a=pos, b=nzr, out=posnzr); // analyze ALU output
+        And(a=jgt, b=posnzr, out=loadpc3); 
+
+        /* compile conditions for jump on j2 */
+        And(a=instruction[15], b=instruction[1], out=jeq);
+        And(a=jeq, b=zr, out=loadpc2); // analyze ALU output
+
+        /* compile conditions for jump on j1 */
+        And(a=instruction[15], b=instruction[2], out=jlt);
+        And(a=jlt, b=ng, out=loadpc1);
+
+        /* combine conditions for j1, j2 */
+        Or(a=loadpc1, b=loadpc2, out=loadpc12);
+
+        /* combine conditions for j1, j2, j3 */
+        Or(a=loadpc12, b=loadpc3, out=loadpc);
+
+        PC(in=aout, load=loadpc, inc=true, reset=reset, out[0..14]=pc);
 }
