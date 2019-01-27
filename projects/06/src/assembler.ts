@@ -1,4 +1,4 @@
-import Parser from 'Parser'
+import Parser from './parser'
 
 switch (process.argv.length) {
     case 2:
@@ -8,6 +8,6 @@ switch (process.argv.length) {
         break
 }
 
-const input: string = argv[1]
-const parser = new Parser({ input })
+const sourceFile: string = process.argv[1]
+const parser = new Parser({ sourceFile })
 

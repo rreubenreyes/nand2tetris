@@ -1,4 +1,4 @@
-import { createReadStream } from 'fs'
+import { ReadStream, WriteStream, createReadStream, createWriteStream } from 'fs'
 import { Interface, createInterface } from 'readline'
 
 enum Command {
@@ -8,9 +8,6 @@ enum Command {
 }
 
 interface IParser {
-    source: Interface
-    build: () => Parser
-    currentLine: number
     commandType: (string) => Command | void
     symbol: () => string
     dest: () => string
@@ -19,27 +16,32 @@ interface IParser {
 }
 
 export default class Parser implements IParser {
-    constructor(this: Parser, { sourceFile: string }) {
-        const [ filename ]: string = sourceFile.split(`.`)
-        const outputFile: WritableStream = `${filename}.hack`
-        this.currentLine = 0
+    private _source: Interface
+    private _currentLine: number
 
-        this.source: Interface = createInterface({
-            input: sourceFile,
-            output: outputFile,
+    constructor({ sourceFile }: { sourceFile: string }) {
+        const [ filename ]: string[] = sourceFile.split(`.asm`) // include upper-level dirnames
+        const input: ReadStream = createReadStream(sourceFile)
+        const output: WriteStream = createWriteStream(`${filename}.hack`)
+
+        this._source = createInterface({
+            input,
+            output,
         })
-        
-        this.source.on(`line`, (line: string) => {
+
+        this._source.on(`line`, (line: string) => {
             // call commandType()
         })
+
+        this._currentLine = 0
     }
 
-    commandType(command: string): Command | void {
+    commandType(this: Parser, command: string): Command | void {
         // parse command and determine commandType
-        const A: RegExp = /^@[A-Za-z0-9]+$/
+        const A: RegExp = /(^@[A-Za-z0-9]+$)|(^@[0-9]+$)/
         const C: RegExp = /^([A-Z]+)=?([A-Z]);?/
         const L: RegExp = /^(?<![0-9])[A-Z\$\.:]+$/
-            
+
         if (A.test(command)) {
             // parse and output A-instruction
             // call symbol()
@@ -48,30 +50,32 @@ export default class Parser implements IParser {
             // call dest()
             // call comp()
             // call jump()
-            
         } else if (L.test(command)) {
             // add symbol to symbol table
             // call symbol()
-            
         } else {
-            console.error(`Error: Invalid command at line ${this.currentLine}`)
+            console.error(`Error: Invalid command at line ${this._currentLine}`)
         }
         // return the symbol 
     }
 
     symbol(): string {
         // TODO: implement symbol()
+        return `please don't yell at me mr. compiler i still have to do this one`
     }
 
     dest(): string {
         // TODO: implement dest()
+        return `please don't yell at me mr. compiler i still have to do this one`
     }
 
     comp(): string {
         // TODO: implement comp()
+        return `please don't yell at me mr. compiler i still have to do this one`
     }
 
     jump(): string {
         // TODO: implement jump()
+        return `please don't yell at me mr. compiler i still have to do this one`
     }
 }
