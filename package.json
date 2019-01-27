@@ -4,7 +4,8 @@
   "description": "nand2tetris source code implemented partially in TypeScript",
   "main": "index.js",
   "dependencies": {
-    "@types/node": "^10.12.18"
+    "@types/node": "^10.12.18",
+    "typescript": "^3.2.4"
   },
   "devDependencies": {},
   "scripts": {
