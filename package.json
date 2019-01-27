@@ -1,0 +1,23 @@
+{
+  "name": "nand2tetris",
+  "version": "1.0.0",
+  "description": "nand2tetris source code implemented partially in TypeScript",
+  "main": "index.js",
+  "dependencies": {
+    "@types/node": "^10.12.18"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rreubenreyes/nand2tetris.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rreubenreyes/nand2tetris/issues"
+  },
+  "homepage": "https://github.com/rreubenreyes/nand2tetris#readme"
+}

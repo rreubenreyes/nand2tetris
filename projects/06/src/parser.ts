@@ -1,33 +1,77 @@
+import { createReadStream } from 'fs'
+import { Interface, createInterface } from 'readline'
+
 enum Command {
-    A_COMMAND,
-    C_COMMAND,
-    L_COMMAND
+    A_COMMAND, // syntax: @value
+    C_COMMAND, // syntax: dest=comp;jump
+    L_COMMAND // syntax: (symbol)
 }
 
-export const hasMoreCommands = (): boolean => {
-    // TODO: implement hasMoreCommands()
+interface IParser {
+    source: Interface
+    build: () => Parser
+    currentLine: number
+    commandType: (string) => Command | void
+    symbol: () => string
+    dest: () => string
+    comp: () => string
+    jump: () => string
 }
 
-export const advance = (): void => {
-    // TODO: implement advance()
-}
+export default class Parser implements IParser {
+    constructor(this: Parser, { sourceFile: string }) {
+        const [ filename ]: string = sourceFile.split(`.`)
+        const outputFile: WritableStream = `${filename}.hack`
+        this.currentLine = 0
 
-export const commandType = (): Command => {
-    // TODO: implement advance()
-}
+        this.source: Interface = createInterface({
+            input: sourceFile,
+            output: outputFile,
+        })
+        
+        this.source.on(`line`, (line: string) => {
+            // call commandType()
+        })
+    }
 
-export const symbol = (): string => {
-    // TODO: implement symbol()
-}
+    commandType(command: string): Command | void {
+        // parse command and determine commandType
+        const A: RegExp = /^@[A-Za-z0-9]+$/
+        const C: RegExp = /^([A-Z]+)=?([A-Z]);?/
+        const L: RegExp = /^(?<![0-9])[A-Z\$\.:]+$/
+            
+        if (A.test(command)) {
+            // parse and output A-instruction
+            // call symbol()
+        } else if (C.test(command)) {
+            // parse and output C-instruction
+            // call dest()
+            // call comp()
+            // call jump()
+            
+        } else if (L.test(command)) {
+            // add symbol to symbol table
+            // call symbol()
+            
+        } else {
+            console.error(`Error: Invalid command at line ${this.currentLine}`)
+        }
+        // return the symbol 
+    }
 
-export const dest = (): string => {
-    // TODO: implement dest()
-}
+    symbol(): string {
+        // TODO: implement symbol()
+    }
 
-export const comp = (): string => {
-    // TODO: implement comp()
-}
+    dest(): string {
+        // TODO: implement dest()
+    }
 
-export const jump = (): string => {
-    // TODO: implement jump()
+    comp(): string {
+        // TODO: implement comp()
+    }
+
+    jump(): string {
+        // TODO: implement jump()
+    }
 }
